@@ -4,6 +4,7 @@ import customtkinter as ctk
 from tkinter import filedialog, messagebox
 from tkinterdnd2 import TkinterDnD, DND_FILES
 
+import ctypes
 import os
 import sys
 from pathlib import Path
@@ -26,6 +27,20 @@ def resource_path(relative_path):
         getattr(sys, "_MEIPASS", Path(__file__).resolve().parent)
     )
     return base_path / relative_path
+
+
+def get_documents_directory():
+    """Return the current Windows user's actual Documents folder."""
+    if os.name == "nt":
+        documents_path = ctypes.create_unicode_buffer(260)
+        result = ctypes.windll.shell32.SHGetFolderPathW(
+            None, 5, None, 0, documents_path
+        )
+        if result == 0 and documents_path.value:
+            return Path(documents_path.value)
+
+    # Fallback for development or non-Windows environments.
+    return Path.home() / "Documents"
 
 
 WINDOW_WIDTH = 1000
@@ -87,7 +102,8 @@ class DocumentConverterApp(TkinterDnD.Tk):
         self.configure(bg="#242424")
 
         # Application icon (also works when packaged with PyInstaller).
-        icon_path = resource_path(Path("assets") / "icons" / "documentconverter.ico")
+        icon_path = resource_path(
+            Path("assets") / "icons" / "documentconverter.ico")
         if icon_path.is_file():
             try:
                 self.iconbitmap(str(icon_path))
@@ -107,7 +123,7 @@ class DocumentConverterApp(TkinterDnD.Tk):
 
         self.selected_file = None
 
-        self.output_dir = Path.cwd() / "converted"
+        self.output_dir = get_documents_directory() / APP_NAME / "converted"
 
         self.worker = None
         self.event_queue = Queue()
@@ -696,7 +712,8 @@ class DocumentConverterApp(TkinterDnD.Tk):
 
         previous_format = self.output_format.get()
         self.available_output_formats = available_formats
-        menu_values = available_formats if available_formats else ["Unavailable"]
+        menu_values = available_formats if available_formats else [
+            "Unavailable"]
         self.output_format.configure(values=menu_values)
 
         if previous_format in available_formats:
@@ -846,7 +863,8 @@ class DocumentConverterApp(TkinterDnD.Tk):
         if category:
             available_for_file = OUTPUT_FORMATS_BY_CATEGORY[category]
             if output_format not in available_for_file:
-                output_format = "PDF" if "PDF" in available_for_file else available_for_file[0]
+                output_format = "PDF" if "PDF" in available_for_file else available_for_file[
+                    0]
                 self.file_output_formats[path] = output_format
         else:
             available_for_file = []
@@ -1126,7 +1144,8 @@ class DocumentConverterApp(TkinterDnD.Tk):
         existing_outputs = []
         for path in self.files:
             selected_format = output_formats[str(path)]
-            expected_output = self.output_dir / f"{path.stem}.{selected_format.lower()}"
+            expected_output = self.output_dir / \
+                f"{path.stem}.{selected_format.lower()}"
             if expected_output.exists():
                 existing_outputs.append(expected_output)
 

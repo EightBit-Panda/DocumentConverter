@@ -1,0 +1,50 @@
+﻿# Python
+__pycache__/
+*.py[cod]
+*.pyd
+.venv/
+venv/
+.env
+
+# PyInstaller
+build/
+build_*/
+dist/
+dist_*/
+*.spec
+
+# LibreOffice runtime and installation files
+installer/lo_runtime/
+installer/lo_runtime_backup/
+installer/lo_runtime_test/
+installer/lo_extracted/
+installer/lo_removed_test/
+installer/downloads/
+installer/lo_test_output/
+installer/lo_test_profile*/
+installer/output/
+
+# Installer build files
+installer/spec_*/
+installer/DocumentConverter_backup.iss
+installer/*.log
+
+# Local development and testing
+test_input/
+test_output/
+test_runtime/
+.pytest_cache/
+.coverage
+*.log
+*.tmp
+
+# IDE and editor
+.vscode/
+.idea/
+
+# Generated application files
+converted/
+installer/Nytt Tekstdokument.txt
+
+# Development test scripts
+test_engine.py
